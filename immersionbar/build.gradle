@@ -1,11 +1,13 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 31
+    namespace 'com.gyf.immersionbar'
+    compileSdkVersion 36
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 31
+        targetSdkVersion 36
 
         consumerProguardFiles "consumer-rules.pro"
     }
@@ -19,4 +21,29 @@ android {
 
 dependencies {
     compileOnly 'androidx.appcompat:appcompat:1.4.1'
+}
+
+// JitPack 发布配置
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                // 使用 Gradle 8+ 的方式
+                groupId = 'com.github.OCNYang'
+                artifactId = 'immersionbar'
+                version = rootProject.ext.immersionbar_version
+
+                // 手动添加 AAR
+                artifact("$buildDir/outputs/aar/immersionbar-release.aar")
+            }
+        }
+    }
+}
+
+// 确保在 publish 之前构建 AAR
+tasks.withType(PublishToMavenRepository) {
+    dependsOn 'assembleRelease'
+}
+tasks.withType(PublishToMavenLocal) {
+    dependsOn 'assembleRelease'
 }

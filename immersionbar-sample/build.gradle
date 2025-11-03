@@ -2,15 +2,21 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
+    namespace 'com.gyf.immersionbar.sample'
+    compileSdkVersion 36
     defaultConfig {
         applicationId "com.gyf.immersionbar.sample"
         minSdkVersion 14
-        targetSdkVersion 31
+        targetSdkVersion 36
         versionCode 1
         versionName "$immersionbar_version"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+    }
+
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
     }
 
     signingConfigs {
@@ -40,8 +46,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    buildFeatures {
-        viewBinding true
+
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 }
 

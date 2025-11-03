@@ -222,6 +222,42 @@ public class BarParams implements Cloneable {
      */
     OnBarListener onBarListener;
 
+    // ============ Android 15+ 新增字段 ============
+
+    /**
+     * 是否启用 Edge-to-Edge 模式
+     * Android 15+ targetSdk 35+ 默认强制启用
+     * The Edge to edge enabled.
+     */
+    public boolean edgeToEdgeEnabled = true;
+
+    /**
+     * WindowInsets 变化监听器
+     * 用于监听系统栏 Insets 的变化
+     * The On insets change listener.
+     */
+    OnInsetsChangeListener onInsetsChangeListener;
+
+    /**
+     * 是否使用新的 WindowInsetsController API
+     * Android 11+ 推荐使用，Android 15+ 必须使用
+     * The Use window insets controller.
+     */
+    public boolean useWindowInsetsController = VersionAdapter.shouldUseWindowInsetsController();
+
+    /**
+     * 调试模式：打印版本适配信息
+     * The Debug print version info.
+     */
+    public boolean debugPrintVersionInfo = false;
+
+    /**
+     * 调试模式：模拟 Android 15 Edge-to-Edge 行为
+     * 用于在低版本设备上测试 Android 15 的行为
+     * The Debug force edge to edge.
+     */
+    public boolean debugForceEdgeToEdge = false;
+
     @Override
     protected BarParams clone() {
         BarParams barParams = null;

@@ -1,12 +1,136 @@
+---
+---
+<h1> 此库在 https://github.com/gyf-dev/ImmersionBar 基础上，对 Android 15、16 版本进行了适配。</h1>
+
+> ps:适配工作方面的代码全部是由 Claude Code 完成，我只在适配流程中做一步步的指引提示工作。**AI 质量，且经测试，放心使用**
+---
+---
+
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+
+
 ![logo](https://github.com/gyf-dev/Screenshots/blob/master/ImmersionBar/readme_head.png)
-# ImmersionBar -- android 4.4以上沉浸式实现 
-[![version](https://img.shields.io/badge/version-3.2.2-brightgreen.svg)](https://bintray.com/geyifeng/maven/immersionbar) [![author](https://img.shields.io/badge/author-gyf--dev-orange.svg)](https://github.com/gyf-dev) [![简书](https://img.shields.io/badge/%E7%AE%80%E4%B9%A6-HeLe%E5%B0%8F%E5%AD%90%E6%8B%BD-blue.svg)](https://www.jianshu.com/p/2a884e211a62) [![QQ群](https://img.shields.io/badge/QQ%E7%BE%A4-314360549-red.svg)]()
+# ImmersionBar -- android 4.4以上沉浸式实现
+[![version](https://img.shields.io/badge/version-3.3.0-brightgreen.svg)](https://bintray.com/geyifeng/maven/immersionbar) [![author](https://img.shields.io/badge/author-gyf--dev-orange.svg)](https://github.com/gyf-dev) [![简书](https://img.shields.io/badge/%E7%AE%80%E4%B9%A6-HeLe%E5%B0%8F%E5%AD%90%E6%8B%BD-blue.svg)](https://www.jianshu.com/p/2a884e211a62) [![QQ群](https://img.shields.io/badge/QQ%E7%BE%A4-314360549-red.svg)]()
+
+## ✨ Android 15/16 支持（v3.3.0 新增）
+
+> **重要更新**：v3.3.0 完全支持 Android 15 和 Android 16！
+
+### 🎉 好消息：现有代码完全不需要修改！
+
+```java
+// 原有代码继续工作，自动适配 Android 15/16
+ImmersionBar.with(this)
+    .statusBarColor(R.color.colorPrimary)
+    .navigationBarColor(R.color.colorPrimary)
+    .init();
+```
+
+✅ **100% 向后兼容** - Android 4.4 到 Android 16 全覆盖
+✅ **自动适配** - 库会自动选择最佳适配方式
+✅ **零破坏性变更** - 无需修改任何现有代码
+
+### 🆕 Android 15+ 新特性（可选使用）
+
+如果你想获得 Android 15 的最佳体验，可以使用新增的 API：
+
+```java
+// Java 示例
+ImmersionBar.with(this)
+    .statusBarColor(Color.TRANSPARENT)
+    .navigationBarColor(Color.TRANSPARENT)
+    .statusBarDarkFont(true)
+    // 🆕 监听系统栏 insets 变化（Android 15+ 生效）
+    .setOnInsetsChangeListener((top, bottom, left, right) -> {
+        findViewById(R.id.toolbar).setPadding(0, top, 0, 0);
+        findViewById(R.id.content).setPadding(0, 0, 0, bottom);
+    })
+    .init();
+```
+
+```kotlin
+// Kotlin 示例
+immersionBar {
+    statusBarColor(Color.TRANSPARENT)
+    navigationBarColor(Color.TRANSPARENT)
+    statusBarDarkFont(true)
+    // 🆕 监听 insets 变化
+    setOnInsetsChangeListener { top, bottom, left, right ->
+        toolbar.updatePadding(top = top)
+        content.updatePadding(bottom = bottom)
+    }
+}
+
+// 🆕 版本检测扩展
+if (isAndroid15OrAbove) {
+    Log.d("Version", versionInfo)
+}
+```
+
+### 📚 详细文档
+- [使用变化总结](USAGE_CHANGES_SUMMARY.md) - 完整的使用说明
+- [Android 15 适配详情](ANDROID_15_ADAPTATION.md) - 技术实现细节
+- [完整示例代码](ANDROID_15_EXAMPLES.md) - 各种使用场景示例
+
+---
 
 ## 直接看效果图，建议下载demo体验，最下面有各个版本的效果图
 <img width="300"  src="https://github.com/gyf-dev/Screenshots/blob/master/ImmersionBar/Screenshot_6.0.gif"/>
 
-## 使用（gyf替换为geyifeng） 
-> 3.1.1以上版本(mavenCentral)
+## 使用
+
+### 添加 JitPack 仓库
+
+在项目级 `build.gradle` 或 `settings.gradle` 中添加 JitPack 仓库：
+
+```groovy
+// 项目级 build.gradle
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }  // 添加 JitPack
+    }
+}
+```
+
+或者（Gradle 7.0+ 推荐）在 `settings.gradle` 中：
+
+```groovy
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }  // 添加 JitPack
+    }
+}
+```
+
+### 添加依赖
+
+> **v3.3.0** (JitPack) - 🆕 支持 Android 15/16 + SDK 36
+
+[![](https://jitpack.io/v/OCNYang/ImmersionBar.svg)](https://jitpack.io/#OCNYang/ImmersionBar)
+
+   ```groovy
+   dependencies {
+       // 基础依赖包，必须要依赖
+       implementation 'com.github.OCNYang.ImmersionBar:immersionbar:3.3.0'
+       // kotlin扩展（可选）
+       implementation 'com.github.OCNYang.ImmersionBar:immersionbar-ktx:3.3.0'
+       // fragment快速实现（可选）已废弃
+       implementation 'com.github.OCNYang.ImmersionBar:immersionbar-components:3.3.0'
+   }
+   ```
+
+### 历史版本
+
+> 3.2.2版本(mavenCentral) - 上一稳定版
    ```groovy
    // 基础依赖包，必须要依赖
    implementation 'com.geyifeng.immersionbar:immersionbar:3.2.2'
@@ -121,6 +245,33 @@
                  .reset()  //重置所以沉浸式参数
                  .init();  //必须调用方可应用以上所配置的参数
     ```
+
+- **Android 15/16 新增 API（v3.3.0）**
+
+    ```java
+     ImmersionBar.with(this)
+                 // Android 15+ Edge-to-Edge 相关 API
+                 .setOnInsetsChangeListener(new OnInsetsChangeListener() {
+                     @Override
+                     public void onInsetsChanged(int top, int bottom, int left, int right) {
+                         // 实时监听系统栏 insets 变化（Android 15+ 生效）
+                         // 用于动态调整布局以适应系统栏
+                         findViewById(R.id.toolbar).setPadding(0, top, 0, 0);
+                         findViewById(R.id.content).setPadding(0, 0, 0, bottom);
+                     }
+                 })
+                 .edgeToEdgeEnabled(true)  // 启用/禁用 Android 15+ Edge-to-Edge 模式，默认为 true
+                 .debugPrintVersionInfo(true)  // 打印版本适配信息到 Logcat，方便调试
+                 .debugForceEdgeToEdge(true)  // 强制启用 Edge-to-Edge（仅用于测试，Android 11+）
+                 .init();
+    ```
+
+    > **注意**：
+    > - `setOnInsetsChangeListener()` 仅在 Android 15+ 生效，Android 14 及以下不会调用回调
+    > - 这些 API 完全可选，不使用也不影响库的正常功能
+    > - 库会根据 Android 版本自动选择最佳适配方式，现有代码无需修改即可兼容 Android 15/16
+    > - 详细使用说明请参考：[Android 15/16 使用变化总结](USAGE_CHANGES_SUMMARY.md)
+
 ## 在Activity中实现沉浸式
 
 - java用法
@@ -129,14 +280,40 @@
     ImmersionBar.with(this).init();
    ```
 - kotlin用法
- 
+
    ```kotlin
     immersionBar {
-        statusBarColor(R.color.colorPrimary) 
+        statusBarColor(R.color.colorPrimary)
         navigationBarColor(R.color.colorPrimary)
     }
    ```
-  
+
+- **kotlin 扩展 - Android 15/16 版本检测（v3.3.0）**
+
+   ```kotlin
+    import com.gyf.immersionbar.ktx.*
+
+    // 版本检测扩展
+    if (isAndroid15OrAbove) {
+        Log.d("TAG", "Running on Android 15+")
+        Log.d("TAG", "Version info: $versionInfo")
+        Log.d("TAG", "Recommended approach: $recommendedApproach")
+    }
+
+    // 配合 Edge-to-Edge 使用
+    immersionBar {
+        statusBarColor(Color.TRANSPARENT)
+        navigationBarColor(Color.TRANSPARENT)
+        statusBarDarkFont(true)
+
+        // 监听 insets 变化（Android 15+ 生效）
+        setOnInsetsChangeListener { top, bottom, left, right ->
+            toolbar.updatePadding(top = top)
+            content.updatePadding(bottom = bottom)
+        }
+    }
+   ```
+
 
 ## 在Fragment中实现沉浸式
 

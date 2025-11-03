@@ -202,5 +202,26 @@ fun Activity.setFitsSystemWindows() = ImmersionBar.setFitsSystemWindows(this)
 fun Fragment.setFitsSystemWindows() = ImmersionBar.setFitsSystemWindows(this)
 fun android.app.Fragment.setFitsSystemWindows() = ImmersionBar.setFitsSystemWindows(this)
 
+// ========== Android 15+ Edge-to-Edge 扩展 ==========
+
+/**
+ * 是否是 Android 15 或更高版本
+ */
+val isAndroid15OrAbove get() = com.gyf.immersionbar.VersionAdapter.isAndroid15OrAbove()
+
+/**
+ * 是否是 Android 11 或更高版本（支持 WindowInsetsController）
+ */
+val isAndroid11OrAbove get() = com.gyf.immersionbar.VersionAdapter.isAndroid11OrAbove()
+
+/**
+ * 获取当前设备推荐的系统栏控制方式描述
+ */
+val recommendedApproach get() = com.gyf.immersionbar.VersionAdapter.getRecommendedApproach()
+
+/**
+ * 获取当前设备的 Android 版本信息字符串
+ */
+val versionInfo get() = com.gyf.immersionbar.VersionAdapter.getVersionInfo()
 
 

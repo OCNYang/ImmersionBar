@@ -1,11 +1,13 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 31
+    namespace 'com.gyf.immersionbar.ktx'
+    compileSdkVersion 36
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 31
+        targetSdkVersion 36
     }
 
     buildTypes {
@@ -15,6 +17,14 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 dependencies {
@@ -22,3 +32,26 @@ dependencies {
     compileOnly 'androidx.appcompat:appcompat:1.4.1'
     compileOnly project(':immersionbar')
 }
+
+// JitPack 发布配置
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId = 'com.github.OCNYang'
+                artifactId = 'immersionbar-ktx'
+                version = rootProject.ext.immersionbar_version
+
+                artifact("$buildDir/outputs/aar/immersionbar-ktx-release.aar")
+            }
+        }
+    }
+}
+
+tasks.withType(PublishToMavenRepository) {
+    dependsOn 'assembleRelease'
+}
+tasks.withType(PublishToMavenLocal) {
+    dependsOn 'assembleRelease'
+}
+

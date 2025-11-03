@@ -405,6 +405,18 @@ public final class ImmersionBar implements ImmersionCallback {
      * 初始化状态栏和导航栏
      */
     void setBar() {
+        // Android 15+ 优先使用 Edge-to-Edge 模式
+        if (VersionAdapter.isAndroid15OrAbove() && mBarParams.edgeToEdgeEnabled) {
+            initEdgeToEdgeForAndroid15();
+            // Android 15+ 仍需要隐藏栏的逻辑
+            hideBarAboveR();
+            // 导航栏显示隐藏监听
+            if (mBarParams.onNavigationBarListener != null) {
+                NavigationBarObserver.getInstance().register(mActivity.getApplication());
+            }
+            return;
+        }
+
         //防止系统栏隐藏时内容区域大小发生变化
         int uiFlags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && !OSUtils.isEMUI3_x()) {
@@ -481,9 +493,14 @@ public final class ImmersionBar implements ImmersionCallback {
     /**
      * 初始化android 5.0以上状态栏和导航栏
      *
+     * Note: This method uses deprecated SYSTEM_UI_FLAG_* constants.
+     * For Android 11+, WindowInsetsController is used alongside this method.
+     * For Android 15+, Edge-to-Edge mode (initEdgeToEdgeForAndroid15) is preferred.
+     *
      * @param uiFlags the ui flags
      * @return the int
      */
+    @SuppressWarnings("deprecation")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private int initBarAboveLOLLIPOP(int uiFlags) {
         //获得默认导航栏颜色
@@ -630,9 +647,15 @@ public final class ImmersionBar implements ImmersionCallback {
      * Hide bar.
      * 隐藏或显示状态栏和导航栏。
      *
+     * Note: This method uses deprecated SYSTEM_UI_FLAG_* constants.
+     * For Android 11+, use WindowInsetsController (handled by hideBarAboveR).
+     * For Android 15+, use Edge-to-Edge mode (handled by initEdgeToEdgeForAndroid15).
+     *
      * @param uiFlags the ui flags
      * @return the int
+     * @deprecated in favor of WindowInsetsController API (Android 11+)
      */
+    @SuppressWarnings("deprecation")
     private int hideBarBelowR(int uiFlags) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             return uiFlags;
@@ -838,7 +861,14 @@ public final class ImmersionBar implements ImmersionCallback {
     /**
      * Sets status bar dark font.
      * 设置状态栏字体颜色，android6.0以上
+     *
+     * Note: This method uses the deprecated SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.
+     * For Android 11+, use WindowInsetsController (handled by setStatusBarDarkFontAboveR).
+     * For Android 15+, use Edge-to-Edge mode (handled by initEdgeToEdgeForAndroid15).
+     *
+     * @deprecated in favor of WindowInsetsController API (Android 11+)
      */
+    @SuppressWarnings("deprecation")
     private int setStatusBarDarkFont(int uiFlags) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (mBarParams.statusBarDarkFont) {
@@ -854,7 +884,14 @@ public final class ImmersionBar implements ImmersionCallback {
     /**
      * 设置导航栏图标亮色与暗色
      * Sets dark navigation icon.
+     *
+     * Note: This method uses the deprecated SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR.
+     * For Android 11+, use WindowInsetsController (handled by setNavigationIconDarkAboveR).
+     * For Android 15+, use Edge-to-Edge mode (handled by initEdgeToEdgeForAndroid15).
+     *
+     * @deprecated in favor of WindowInsetsController API (Android 11+)
      */
+    @SuppressWarnings("deprecation")
     private int setNavigationIconDark(int uiFlags) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (mBarParams.navigationBarDarkIcon) {
@@ -923,6 +960,90 @@ public final class ImmersionBar implements ImmersionCallback {
                 controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
             }
         }
+    }
+
+    /**
+     * Android 15+ Edge-to-Edge 适配
+     * 在 Android 15 (API 35) 及以上版本，targetSdk 35+ 的应用会强制启用 Edge-to-Edge
+     */
+    @RequiresApi(api = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    private void initEdgeToEdgeForAndroid15() {
+        if (mBarParams.debugPrintVersionInfo) {
+            android.util.Log.d("ImmersionBar", "Android 15+ Edge-to-Edge mode: " + VersionAdapter.getVersionInfo());
+        }
+
+        // Android 15+ 强制 Edge-to-Edge，系统栏默认透明
+        // 通过 WindowInsetsController 控制系统栏外观
+        WindowInsetsController controller = mContentView.getWindowInsetsController();
+        if (controller == null) {
+            return;
+        }
+
+        // 设置状态栏深色字体
+        if (mBarParams.statusBarDarkFont || mBarParams.autoStatusBarDarkModeEnable) {
+            controller.setSystemBarsAppearance(
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+        } else {
+            controller.setSystemBarsAppearance(
+                    0,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS);
+        }
+
+        // 设置导航栏深色图标
+        if (mBarParams.navigationBarEnable) {
+            if (mBarParams.navigationBarDarkIcon || mBarParams.autoNavigationBarDarkModeEnable) {
+                controller.setSystemBarsAppearance(
+                        WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS,
+                        WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
+            } else {
+                controller.setSystemBarsAppearance(
+                        0,
+                        WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
+            }
+        }
+
+        // 注册 WindowInsets 监听器
+        if (mBarParams.onInsetsChangeListener != null) {
+            setupInsetsListener();
+        }
+    }
+
+    /**
+     * 设置 WindowInsets 监听器
+     * 用于监听系统栏 Insets 的变化
+     */
+    @RequiresApi(api = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    private void setupInsetsListener() {
+        mContentView.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                if (mBarParams.onInsetsChangeListener != null) {
+                    androidx.core.graphics.Insets systemBars = androidx.core.graphics.Insets.NONE;
+
+                    // 获取系统栏 insets
+                    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                        android.graphics.Insets platformInsets = insets.getInsets(WindowInsets.Type.systemBars());
+                        systemBars = androidx.core.graphics.Insets.of(
+                                platformInsets.left,
+                                platformInsets.top,
+                                platformInsets.right,
+                                platformInsets.bottom
+                        );
+                    }
+
+                    // 通知监听器
+                    mBarParams.onInsetsChangeListener.onInsetsChanged(
+                            systemBars.top,
+                            systemBars.bottom,
+                            systemBars.left,
+                            systemBars.right
+                    );
+                }
+                // 继续分发 insets
+                return v.onApplyWindowInsets(insets);
+            }
+        });
     }
 
     protected void unsetSystemUiFlag(int systemUiFlag) {
@@ -3271,6 +3392,57 @@ public final class ImmersionBar implements ImmersionCallback {
                 mBarParams.onBarListener = null;
             }
         }
+        return this;
+    }
+
+    /**
+     * 设置 WindowInsets 变化监听器（Android 15+ Edge-to-Edge 模式）
+     * Sets on insets change listener for Android 15+ Edge-to-Edge mode.
+     *
+     * @param onInsetsChangeListener the on insets change listener
+     * @return the immersion bar
+     */
+    public ImmersionBar setOnInsetsChangeListener(@Nullable OnInsetsChangeListener onInsetsChangeListener) {
+        if (mBarParams.onInsetsChangeListener == null) {
+            mBarParams.onInsetsChangeListener = onInsetsChangeListener;
+        }
+        return this;
+    }
+
+    /**
+     * 是否启用 Edge-to-Edge 模式（Android 15+ 默认强制启用）
+     * Enable or disable Edge-to-Edge mode (enforced by default on Android 15+).
+     *
+     * @param enabled true to enable, false to disable (use legacy mode)
+     * @return the immersion bar
+     */
+    public ImmersionBar edgeToEdgeEnabled(boolean enabled) {
+        mBarParams.edgeToEdgeEnabled = enabled;
+        return this;
+    }
+
+    /**
+     * 启用调试模式：打印版本适配信息
+     * Enable debug mode: print version adaptation info.
+     *
+     * @param enabled true to enable debug logging
+     * @return the immersion bar
+     */
+    public ImmersionBar debugPrintVersionInfo(boolean enabled) {
+        mBarParams.debugPrintVersionInfo = enabled;
+        return this;
+    }
+
+    /**
+     * 调试模式：强制使用 Edge-to-Edge 模式（用于在低版本设备上测试）
+     * Debug mode: force Edge-to-Edge mode (for testing on lower Android versions).
+     * WARNING: This is for testing purposes only!
+     *
+     * @param enabled true to force Edge-to-Edge mode
+     * @return the immersion bar
+     */
+    public ImmersionBar debugForceEdgeToEdge(boolean enabled) {
+        mBarParams.debugForceEdgeToEdge = enabled;
         return this;
     }
 

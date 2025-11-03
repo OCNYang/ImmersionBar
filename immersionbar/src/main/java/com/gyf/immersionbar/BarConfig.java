@@ -16,9 +16,14 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
+import android.view.WindowInsets;
 import android.view.WindowManager;
+import android.view.WindowMetrics;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.graphics.Insets;
+import androidx.core.view.WindowInsetsCompat;
 
 /**
  * The type Bar config.
@@ -28,13 +33,18 @@ import androidx.annotation.NonNull;
  */
 class BarConfig {
 
-    private final int mStatusBarHeight;
+    private int mStatusBarHeight;
     private final int mActionBarHeight;
-    private final boolean mHasNavigationBar;
-    private final int mNavigationBarHeight;
-    private final int mNavigationBarWidth;
+    private boolean mHasNavigationBar;
+    private int mNavigationBarHeight;
+    private int mNavigationBarWidth;
     private final boolean mInPortrait;
     private final float mSmallestWidthDp;
+
+    // Android 15+ 新增字段
+    private Insets mSystemBarsInsets;
+    private Insets mDisplayCutoutInsets;
+    private Insets mNavigationBarsInsets;
 
     /**
      * Instantiates a new Bar config.
@@ -45,11 +55,82 @@ class BarConfig {
         Resources res = activity.getResources();
         mInPortrait = (res.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT);
         mSmallestWidthDp = getSmallestWidthDp(activity);
-        mStatusBarHeight = getInternalDimensionSize(activity, IMMERSION_STATUS_BAR_HEIGHT);
+
+        // Android 15+ 优先使用 WindowInsets API
+        if (VersionAdapter.isAndroid15OrAbove()) {
+            initForAndroid15(activity);
+        } else {
+            initLegacy(activity);
+        }
+
         mActionBarHeight = getActionBarHeight(activity);
+    }
+
+    /**
+     * Android 15+ 使用 WindowInsets API 初始化
+     */
+    @RequiresApi(api = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    private void initForAndroid15(Activity activity) {
+        WindowManager wm = activity.getWindowManager();
+        WindowMetrics metrics = wm.getCurrentWindowMetrics();
+        WindowInsets insets = metrics.getWindowInsets();
+
+        // 获取系统栏 insets
+        mSystemBarsInsets = toAndroidXInsets(insets.getInsets(WindowInsets.Type.systemBars()));
+        mNavigationBarsInsets = toAndroidXInsets(insets.getInsets(WindowInsets.Type.navigationBars()));
+        mDisplayCutoutInsets = toAndroidXInsets(insets.getInsets(WindowInsets.Type.displayCutout()));
+
+        // 状态栏高度优先从 insets 获取
+        int statusBarHeight = mSystemBarsInsets.top;
+        if (statusBarHeight <= 0) {
+            // 兜底：使用传统方法
+            statusBarHeight = getInternalDimensionSize(activity, IMMERSION_STATUS_BAR_HEIGHT);
+        }
+        mStatusBarHeight = statusBarHeight;
+
+        // 导航栏高度和宽度
+        int navHeight = mNavigationBarsInsets.bottom;
+        int navWidth = Math.max(mNavigationBarsInsets.left, mNavigationBarsInsets.right);
+
+        if (navHeight <= 0 && navWidth <= 0) {
+            // 兜底：使用传统方法
+            if (hasNavBar(activity)) {
+                navHeight = getNavigationBarHeightInternal(activity);
+                navWidth = getInternalDimensionSize(activity, IMMERSION_NAVIGATION_BAR_WIDTH);
+            }
+        }
+
+        mNavigationBarHeight = navHeight;
+        mNavigationBarWidth = navWidth;
+        mHasNavigationBar = (navHeight > 0 || navWidth > 0);
+    }
+
+    /**
+     * 转换为 AndroidX Insets
+     */
+    @RequiresApi(api = Build.VERSION_CODES.VANILLA_ICE_CREAM)
+    private Insets toAndroidXInsets(android.graphics.Insets platformInsets) {
+        return Insets.of(
+            platformInsets.left,
+            platformInsets.top,
+            platformInsets.right,
+            platformInsets.bottom
+        );
+    }
+
+    /**
+     * 传统方法初始化（Android 14 及以下）
+     */
+    private void initLegacy(Activity activity) {
+        mStatusBarHeight = getInternalDimensionSize(activity, IMMERSION_STATUS_BAR_HEIGHT);
         mNavigationBarHeight = getNavigationBarHeight(activity);
         mNavigationBarWidth = getNavigationBarWidth(activity);
         mHasNavigationBar = (mNavigationBarHeight > 0);
+
+        // 初始化为 null
+        mSystemBarsInsets = null;
+        mDisplayCutoutInsets = null;
+        mNavigationBarsInsets = null;
     }
 
     @TargetApi(14)
@@ -229,5 +310,35 @@ class BarConfig {
 
     static int getNavigationBarWidthInternal(@NonNull Context context) {
         return getInternalDimensionSize(context, IMMERSION_NAVIGATION_BAR_WIDTH);
+    }
+
+    // ============ Android 15+ 新增 getter 方法 ============
+
+    /**
+     * 获取系统栏 Insets (Android 15+)
+     * 包含状态栏和导航栏的 insets
+     *
+     * @return System bars insets, null if Android < 15
+     */
+    Insets getSystemBarsInsets() {
+        return mSystemBarsInsets;
+    }
+
+    /**
+     * 获取刘海屏/打孔屏 Insets (Android 15+)
+     *
+     * @return Display cutout insets, null if Android < 15
+     */
+    Insets getDisplayCutoutInsets() {
+        return mDisplayCutoutInsets;
+    }
+
+    /**
+     * 获取导航栏 Insets (Android 15+)
+     *
+     * @return Navigation bars insets, null if Android < 15
+     */
+    Insets getNavigationBarsInsets() {
+        return mNavigationBarsInsets;
     }
 }
