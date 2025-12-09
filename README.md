@@ -15,11 +15,11 @@
 
 ![logo](https://github.com/gyf-dev/Screenshots/blob/master/ImmersionBar/readme_head.png)
 # ImmersionBar -- android 4.4以上沉浸式实现
-[![version](https://img.shields.io/badge/version-3.4.1-brightgreen.svg)](https://jitpack.io/#OCNYang/ImmersionBar) [![author](https://img.shields.io/badge/author-gyf--dev-orange.svg)](https://github.com/gyf-dev) [![简书](https://img.shields.io/badge/%E7%AE%80%E4%B9%A6-HeLe%E5%B0%8F%E5%AD%90%E6%8B%BD-blue.svg)](https://www.jianshu.com/p/2a884e211a62) [![QQ群](https://img.shields.io/badge/QQ%E7%BE%A4-314360549-red.svg)]()
+[![version](https://img.shields.io/badge/version-3.4.2-brightgreen.svg)](https://jitpack.io/#OCNYang/ImmersionBar) [![author](https://img.shields.io/badge/author-gyf--dev-orange.svg)](https://github.com/gyf-dev) [![简书](https://img.shields.io/badge/%E7%AE%80%E4%B9%A6-HeLe%E5%B0%8F%E5%AD%90%E6%8B%BD-blue.svg)](https://www.jianshu.com/p/2a884e211a62) [![QQ群](https://img.shields.io/badge/QQ%E7%BE%A4-314360549-red.svg)]()
 
-## ✨ Android 15/16 支持（v3.4.1）
+## ✨ Android 15/16 支持（v3.4.2）
 
-> **重要更新**：v3.4.1 修复了 Android 15/16 上 statusBarColor 和 navigationBarColor 不生效的问题。
+> **重要更新**：v3.4.2 修复了 Android 15/16（targetSdkVersion 35+）上 statusBarColor 和 navigationBarColor 不生效的问题。
 
 ### 🎉 好消息：现有代码完全不需要修改！
 
@@ -32,50 +32,8 @@ ImmersionBar.with(this)
 ```
 
 ✅ **100% 向后兼容** - Android 4.4 到 Android 16 全覆盖
-✅ **自动适配** - 库会自动选择最佳适配方式
+✅ **自动适配** - 库会自动检测 Android 15+ 并使用兼容方案
 ✅ **零破坏性变更** - 无需修改任何现有代码
-
-### 🆕 Android 15+ 新特性（可选使用）
-
-如果你想获得 Android 15 的最佳体验，可以使用新增的 API：
-
-```java
-// Java 示例
-ImmersionBar.with(this)
-    .statusBarColor(Color.TRANSPARENT)
-    .navigationBarColor(Color.TRANSPARENT)
-    .statusBarDarkFont(true)
-    // 🆕 监听系统栏 insets 变化（Android 15+ 生效）
-    .setOnInsetsChangeListener((top, bottom, left, right) -> {
-        findViewById(R.id.toolbar).setPadding(0, top, 0, 0);
-        findViewById(R.id.content).setPadding(0, 0, 0, bottom);
-    })
-    .init();
-```
-
-```kotlin
-// Kotlin 示例
-immersionBar {
-    statusBarColor(Color.TRANSPARENT)
-    navigationBarColor(Color.TRANSPARENT)
-    statusBarDarkFont(true)
-    // 🆕 监听 insets 变化
-    setOnInsetsChangeListener { top, bottom, left, right ->
-        toolbar.updatePadding(top = top)
-        content.updatePadding(bottom = bottom)
-    }
-}
-
-// 🆕 版本检测扩展
-if (isAndroid15OrAbove) {
-    Log.d("Version", versionInfo)
-}
-```
-
-### 📚 详细文档
-- [使用变化总结](USAGE_CHANGES_SUMMARY.md) - 完整的使用说明
-- [Android 15 适配详情](ANDROID_15_ADAPTATION.md) - 技术实现细节
-- [完整示例代码](ANDROID_15_EXAMPLES.md) - 各种使用场景示例
 
 ---
 
@@ -113,30 +71,30 @@ dependencyResolutionManagement {
 
 ### 添加依赖
 
-> **v3.4.1** (JitPack) - 🔧 修复 Android 15/16 上 statusBarColor/navigationBarColor 不生效的问题
+> **v3.4.2** (JitPack) - 🔧 修复 Android 15/16 上 statusBarColor/navigationBarColor 不生效的问题
 
 [![](https://jitpack.io/v/OCNYang/ImmersionBar.svg)](https://jitpack.io/#OCNYang/ImmersionBar)
 
    ```groovy
    dependencies {
        // 基础依赖包，必须要依赖
-       implementation 'com.github.OCNYang.ImmersionBar:immersionbar:3.4.1'
+       implementation 'com.github.OCNYang.ImmersionBar:immersionbar:3.4.2'
        // kotlin扩展（可选）
-       implementation 'com.github.OCNYang.ImmersionBar:immersionbar-ktx:3.4.1'
+       implementation 'com.github.OCNYang.ImmersionBar:immersionbar-ktx:3.4.2'
        // fragment快速实现（可选）已废弃
-       implementation 'com.github.OCNYang.ImmersionBar:immersionbar-components:3.4.1'
+       implementation 'com.github.OCNYang.ImmersionBar:immersionbar-components:3.4.2'
    }
    ```
 
 ### 历史版本
 
-> 3.4.0版本 - 支持 Android 15/16 + SDK 36 + 修复 JitPack 构建
+> 3.4.1 版本 - 修复 statusBarColor/navigationBarColor 不生效（仍有问题）
 
-> 3.3.0版本 - Android 15/16 适配版本（构建失败）
+> 3.4.0 版本 - 支持 Android 15/16 + SDK 36 + 修复 JitPack 构建
 
-> 3.2.2版本 - mavenCentral 上一稳定版
+> 3.2.2 版本 - mavenCentral 上一稳定版
 
-> 3.0.0版本 - jcenter 版本
+> 3.0.0 版本 - jcenter 版本
 
 ## 版本说明
 #### [点我查看版本说明](https://github.com/gyf-dev/ImmersionBar/wiki)
