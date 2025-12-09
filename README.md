@@ -15,11 +15,11 @@
 
 ![logo](https://github.com/gyf-dev/Screenshots/blob/master/ImmersionBar/readme_head.png)
 # ImmersionBar -- android 4.4以上沉浸式实现
-[![version](https://img.shields.io/badge/version-3.4.0-brightgreen.svg)](https://jitpack.io/#OCNYang/ImmersionBar) [![author](https://img.shields.io/badge/author-gyf--dev-orange.svg)](https://github.com/gyf-dev) [![简书](https://img.shields.io/badge/%E7%AE%80%E4%B9%A6-HeLe%E5%B0%8F%E5%AD%90%E6%8B%BD-blue.svg)](https://www.jianshu.com/p/2a884e211a62) [![QQ群](https://img.shields.io/badge/QQ%E7%BE%A4-314360549-red.svg)]()
+[![version](https://img.shields.io/badge/version-3.4.1-brightgreen.svg)](https://jitpack.io/#OCNYang/ImmersionBar) [![author](https://img.shields.io/badge/author-gyf--dev-orange.svg)](https://github.com/gyf-dev) [![简书](https://img.shields.io/badge/%E7%AE%80%E4%B9%A6-HeLe%E5%B0%8F%E5%AD%90%E6%8B%BD-blue.svg)](https://www.jianshu.com/p/2a884e211a62) [![QQ群](https://img.shields.io/badge/QQ%E7%BE%A4-314360549-red.svg)]()
 
-## ✨ Android 15/16 支持（v3.4.0）
+## ✨ Android 15/16 支持（v3.4.1）
 
-> **重要更新**：v3.4.0 完全支持 Android 15 和 Android 16！修复 JitPack 构建问题。
+> **重要更新**：v3.4.1 修复了 Android 15/16 上 statusBarColor 和 navigationBarColor 不生效的问题。
 
 ### 🎉 好消息：现有代码完全不需要修改！
 
@@ -113,24 +113,29 @@ dependencyResolutionManagement {
 
 ### 添加依赖
 
-> **v3.4.0** (JitPack) - 🆕 支持 Android 15/16 + SDK 36 + 修复 JitPack 构建
+> **v3.4.1** (JitPack) - 🔧 修复 Android 15/16 上 statusBarColor/navigationBarColor 不生效的问题
 
 [![](https://jitpack.io/v/OCNYang/ImmersionBar.svg)](https://jitpack.io/#OCNYang/ImmersionBar)
 
    ```groovy
    dependencies {
        // 基础依赖包，必须要依赖
-       implementation 'com.github.OCNYang.ImmersionBar:immersionbar:3.4.0'
+       implementation 'com.github.OCNYang.ImmersionBar:immersionbar:3.4.1'
        // kotlin扩展（可选）
-       implementation 'com.github.OCNYang.ImmersionBar:immersionbar-ktx:3.4.0'
+       implementation 'com.github.OCNYang.ImmersionBar:immersionbar-ktx:3.4.1'
        // fragment快速实现（可选）已废弃
-       implementation 'com.github.OCNYang.ImmersionBar:immersionbar-components:3.4.0'
+       implementation 'com.github.OCNYang.ImmersionBar:immersionbar-components:3.4.1'
    }
    ```
 
 ### 历史版本
 
-> 3.3.0版本(JitPack) - Android 15/16 适配版本（构建失败，请使用 3.4.0）
+> 3.4.0版本(JitPack) - 支持 Android 15/16 + SDK 36 + 修复 JitPack 构建
+   ```groovy
+   implementation 'com.github.OCNYang.ImmersionBar:immersionbar:3.4.0'
+   ```
+
+> 3.3.0版本(JitPack) - Android 15/16 适配版本（构建失败，请使用 3.4.1）
    ```groovy
    // 基础依赖包，必须要依赖
    implementation 'com.github.OCNYang.ImmersionBar:immersionbar:3.3.0'
