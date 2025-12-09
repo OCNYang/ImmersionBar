@@ -972,6 +972,33 @@ public final class ImmersionBar implements ImmersionCallback {
             android.util.Log.d("ImmersionBar", "Android 15+ Edge-to-Edge mode: " + VersionAdapter.getVersionInfo());
         }
 
+        // 获得默认导航栏颜色
+        if (!mInitialized) {
+            mBarParams.defaultNavigationBarColor = mWindow.getNavigationBarColor();
+        }
+
+        // 需要设置这个才能设置状态栏和导航栏颜色
+        mWindow.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+        // 设置状态栏颜色
+        if (mBarParams.statusBarColorEnabled) {
+            mWindow.setStatusBarContrastEnforced(false);
+            mWindow.setStatusBarColor(ColorUtils.blendARGB(mBarParams.statusBarColor,
+                    mBarParams.statusBarColorTransform, mBarParams.statusBarAlpha));
+        } else {
+            mWindow.setStatusBarColor(ColorUtils.blendARGB(mBarParams.statusBarColor,
+                    Color.TRANSPARENT, mBarParams.statusBarAlpha));
+        }
+
+        // 设置导航栏颜色
+        if (mBarParams.navigationBarEnable) {
+            mWindow.setNavigationBarContrastEnforced(false);
+            mWindow.setNavigationBarColor(ColorUtils.blendARGB(mBarParams.navigationBarColor,
+                    mBarParams.navigationBarColorTransform, mBarParams.navigationBarAlpha));
+        } else {
+            mWindow.setNavigationBarColor(mBarParams.defaultNavigationBarColor);
+        }
+
         // Android 15+ 强制 Edge-to-Edge，系统栏默认透明
         // 通过 WindowInsetsController 控制系统栏外观
         WindowInsetsController controller = mContentView.getWindowInsetsController();
