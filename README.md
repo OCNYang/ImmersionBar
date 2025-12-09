@@ -130,39 +130,13 @@ dependencyResolutionManagement {
 
 ### 历史版本
 
-> 3.4.0版本(JitPack) - 支持 Android 15/16 + SDK 36 + 修复 JitPack 构建
-   ```groovy
-   implementation 'com.github.OCNYang.ImmersionBar:immersionbar:3.4.0'
-   ```
+> 3.4.0版本 - 支持 Android 15/16 + SDK 36 + 修复 JitPack 构建
 
-> 3.3.0版本(JitPack) - Android 15/16 适配版本（构建失败，请使用 3.4.1）
-   ```groovy
-   // 基础依赖包，必须要依赖
-   implementation 'com.github.OCNYang.ImmersionBar:immersionbar:3.3.0'
-   // kotlin扩展（可选）
-   implementation 'com.github.OCNYang.ImmersionBar:immersionbar-ktx:3.3.0'
-   // fragment快速实现（可选）已废弃
-   implementation 'com.github.OCNYang.ImmersionBar:immersionbar-components:3.3.0'
-   ```
+> 3.3.0版本 - Android 15/16 适配版本（构建失败）
 
-> 3.2.2版本(mavenCentral) - 上一稳定版
-   ```groovy
-   // 基础依赖包，必须要依赖
-   implementation 'com.geyifeng.immersionbar:immersionbar:3.2.2'
-   // kotlin扩展（可选）
-   implementation 'com.geyifeng.immersionbar:immersionbar-ktx:3.2.2'
-   // fragment快速实现（可选）已废弃
-   implementation 'com.geyifeng.immersionbar:immersionbar-components:3.2.2'
-   ```
-> 3.0.0版本(jcenter)
-   ```groovy
-   // 基础依赖包，必须要依赖
-   implementation 'com.gyf.immersionbar:immersionbar:3.0.0'
-   // kotlin扩展（可选）
-   implementation 'com.gyf.immersionbar:immersionbar-ktx:3.0.0'
-   // fragment快速实现（可选）
-   implementation 'com.gyf.immersionbar:immersionbar-components:3.0.0'
-   ```
+> 3.2.2版本 - mavenCentral 上一稳定版
+
+> 3.0.0版本 - jcenter 版本
 
 ## 版本说明
 #### [点我查看版本说明](https://github.com/gyf-dev/ImmersionBar/wiki)
