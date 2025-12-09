@@ -529,9 +529,28 @@ public final class ImmersionBar implements ImmersionCallback {
         } else {
             mWindow.setNavigationBarColor(mBarParams.defaultNavigationBarColor);
         }
-        // Android 15+ Edge-to-Edge 强制模式下，需要使用假的状态栏 View 来显示颜色
+        // Android 15+ Edge-to-Edge 强制模式下，需要使用假的系统栏 View 来显示颜色
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-            setupStatusBarView();
+            // 处理状态栏
+            if (mBarParams.barHide == BarHide.FLAG_HIDE_STATUS_BAR || mBarParams.barHide == BarHide.FLAG_HIDE_BAR) {
+                // 隐藏状态栏时，隐藏假的状态栏 View
+                View statusBarView = mDecorView.findViewById(IMMERSION_STATUS_BAR_VIEW_ID);
+                if (statusBarView != null) {
+                    statusBarView.setVisibility(View.GONE);
+                }
+            } else {
+                setupStatusBarView();
+            }
+            // 处理导航栏
+            if (mBarParams.barHide == BarHide.FLAG_HIDE_NAVIGATION_BAR || mBarParams.barHide == BarHide.FLAG_HIDE_BAR) {
+                // 隐藏导航栏时，隐藏假的导航栏 View
+                View navigationBarView = mDecorView.findViewById(IMMERSION_NAVIGATION_BAR_VIEW_ID);
+                if (navigationBarView != null) {
+                    navigationBarView.setVisibility(View.GONE);
+                }
+            } else if (mBarParams.navigationBarEnable && mBarConfig.hasNavigationBar()) {
+                setupNavBarView();
+            }
         }
         return uiFlags;
     }
