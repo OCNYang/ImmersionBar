@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ImmersionBar</string>
+    <string name="app_name">ImmersionBar Demo</string>
     <string name="text_params">Bar相关参数信息</string>
     <string name="text_params_kotlin">Bar相关参数信息(kotlin)</string>
     <string name="text_pic_color">图片状态栏 + 彩色导航栏</string>

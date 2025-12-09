@@ -4,7 +4,18 @@
       "Bash(./gradlew build:*)",
       "Bash(./gradlew:*)",
       "WebSearch",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "WebFetch(domain:jitpack.io)",
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git tag:*)",
+      "Bash(git push:*)",
+      "Bash(git restore:*)",
+      "Bash(git show:*)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:stackoverflow.com)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []
