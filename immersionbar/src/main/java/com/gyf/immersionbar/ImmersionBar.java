@@ -549,7 +549,7 @@ public final class ImmersionBar implements ImmersionCallback {
                     navigationBarView.setVisibility(View.GONE);
                 }
             } else if (mBarParams.navigationBarEnable && mBarConfig.hasNavigationBar()) {
-                setupNavBarView();
+                setupNavBarViewForAndroid15();
             }
         }
         return uiFlags;
@@ -634,6 +634,32 @@ public final class ImmersionBar implements ImmersionCallback {
         } else {
             navigationBarView.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     * Android 15+ 专用：设置一个可以自定义颜色的导航栏
+     * 与 setupNavBarView 不同，不检查 navigationBarWithKitkatEnable 条件
+     */
+    private void setupNavBarViewForAndroid15() {
+        View navigationBarView = mDecorView.findViewById(IMMERSION_NAVIGATION_BAR_VIEW_ID);
+        if (navigationBarView == null) {
+            navigationBarView = new View(mActivity);
+            navigationBarView.setId(IMMERSION_NAVIGATION_BAR_VIEW_ID);
+            mDecorView.addView(navigationBarView);
+        }
+
+        FrameLayout.LayoutParams params;
+        if (mBarConfig.isNavigationAtBottom()) {
+            params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, mBarConfig.getNavigationBarHeight());
+            params.gravity = Gravity.BOTTOM;
+        } else {
+            params = new FrameLayout.LayoutParams(mBarConfig.getNavigationBarWidth(), FrameLayout.LayoutParams.MATCH_PARENT);
+            params.gravity = Gravity.END;
+        }
+        navigationBarView.setLayoutParams(params);
+        navigationBarView.setBackgroundColor(ColorUtils.blendARGB(mBarParams.navigationBarColor,
+                mBarParams.navigationBarColorTransform, mBarParams.navigationBarAlpha));
+        navigationBarView.setVisibility(View.VISIBLE);
     }
 
     /**
