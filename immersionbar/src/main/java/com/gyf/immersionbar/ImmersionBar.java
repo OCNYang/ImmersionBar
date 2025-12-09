@@ -542,13 +542,15 @@ public final class ImmersionBar implements ImmersionCallback {
                 setupStatusBarView();
             }
             // 处理导航栏
+            // 注意：Android 15+ 手势导航模式下 mBarConfig.hasNavigationBar() 可能返回 false
+            // 但仍然需要添加假的导航栏 View 来显示颜色，所以这里不依赖 hasNavigationBar() 判断
             if (mBarParams.barHide == BarHide.FLAG_HIDE_NAVIGATION_BAR || mBarParams.barHide == BarHide.FLAG_HIDE_BAR) {
                 // 隐藏导航栏时，隐藏假的导航栏 View
                 View navigationBarView = mDecorView.findViewById(IMMERSION_NAVIGATION_BAR_VIEW_ID);
                 if (navigationBarView != null) {
                     navigationBarView.setVisibility(View.GONE);
                 }
-            } else if (mBarParams.navigationBarEnable && mBarConfig.hasNavigationBar()) {
+            } else if (mBarParams.navigationBarEnable) {
                 setupNavBarViewForAndroid15();
             }
         }
@@ -638,9 +640,24 @@ public final class ImmersionBar implements ImmersionCallback {
 
     /**
      * Android 15+ 专用：设置一个可以自定义颜色的导航栏
-     * 与 setupNavBarView 不同，不检查 navigationBarWithKitkatEnable 条件
+     * 与 setupNavBarView 不同：
+     * 1. 不检查 navigationBarWithKitkatEnable 条件
+     * 2. 直接从系统资源获取导航栏高度，不依赖 mBarConfig（因为手势导航模式下 mBarConfig 可能返回 0）
      */
     private void setupNavBarViewForAndroid15() {
+        // 直接从系统资源获取导航栏高度，绕过 GestureUtils 的手势导航检测
+        int navigationBarHeight = BarConfig.getNavigationBarHeightInternal(mActivity);
+        int navigationBarWidth = BarConfig.getNavigationBarWidthInternal(mActivity);
+
+        // 如果高度和宽度都为 0，说明确实没有导航栏，不需要添加 View
+        if (navigationBarHeight == 0 && navigationBarWidth == 0) {
+            View existingView = mDecorView.findViewById(IMMERSION_NAVIGATION_BAR_VIEW_ID);
+            if (existingView != null) {
+                existingView.setVisibility(View.GONE);
+            }
+            return;
+        }
+
         View navigationBarView = mDecorView.findViewById(IMMERSION_NAVIGATION_BAR_VIEW_ID);
         if (navigationBarView == null) {
             navigationBarView = new View(mActivity);
@@ -650,10 +667,10 @@ public final class ImmersionBar implements ImmersionCallback {
 
         FrameLayout.LayoutParams params;
         if (mBarConfig.isNavigationAtBottom()) {
-            params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, mBarConfig.getNavigationBarHeight());
+            params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, navigationBarHeight);
             params.gravity = Gravity.BOTTOM;
         } else {
-            params = new FrameLayout.LayoutParams(mBarConfig.getNavigationBarWidth(), FrameLayout.LayoutParams.MATCH_PARENT);
+            params = new FrameLayout.LayoutParams(navigationBarWidth, FrameLayout.LayoutParams.MATCH_PARENT);
             params.gravity = Gravity.END;
         }
         navigationBarView.setLayoutParams(params);
